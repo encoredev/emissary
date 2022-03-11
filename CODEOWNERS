@@ -1,0 +1,5 @@
+# All files in this repo are owned by and can be approved by all Encore engineers
+#
+# These ownership rules are used to enable automatic PR reviews
+
+* @encoredev/engineers
