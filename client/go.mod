@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/rs/zerolog v1.26.1
-	go.encore.dev/emissary v0.0.0
+	go.encore.dev/emissary v0.0.0-00010101000000-000000000000
 	golang.org/x/net v0.0.0-20211008194852-3b03d305991f
 )
 
@@ -19,6 +19,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 )
 
