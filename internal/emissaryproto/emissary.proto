@@ -1,0 +1,11 @@
+syntax = "proto3";
+package emissaryproto;
+
+option go_package = "/emissaryproto";
+
+message ServerConnect {
+  string server_software  = 1; // What's the server software name
+  string server_version   = 2; // What's the server's version
+  int32  protocol_version = 3; // What's the protocol version we're going to use
+  bytes  connection_nonce = 4; // What's the server's requested nonce
+}

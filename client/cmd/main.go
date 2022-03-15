@@ -7,11 +7,15 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go.encore.dev/emissary"
+	"go.encore.dev/emissary/internal/auth"
 )
 
 func main() {
 	configureLogger()
-	emissaryClient := emissary.NewWebsocketDialer("ws://localhost:8000/proxy")
+	emissaryClient := emissary.NewWebsocketDialer("ws://localhost:8000/proxy", auth.Key{
+		KeyID: 123,
+		Data:  []byte("super-secret-key"),
+	})
 
 	// setup a http client
 	httpTransport := &http.Transport{
