@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+	github.com/aws/aws-lambda-go v1.28.0
 	github.com/cockroachdb/errors v1.9.0
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
