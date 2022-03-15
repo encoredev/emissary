@@ -24,8 +24,7 @@ type Dialer struct {
 	key            auth.Key
 }
 
-var _ proxy.Dialer = (*Dialer)(nil)
-var _ proxy.ContextDialer = (*Dialer)(nil)
+var _ transportDialer = (*Dialer)(nil)
 
 // NewWebsocketDialer creates a dialer which will connect to emissary over a websocket
 func NewWebsocketDialer(server string, key auth.Key) *Dialer {
