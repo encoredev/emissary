@@ -6,10 +6,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func init() {
-	router.Use(RequestLogger())
-}
-
 type requestLogger struct {
 	handler http.Handler
 }

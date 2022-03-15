@@ -1,4 +1,4 @@
-package http
+package main
 
 import (
 	"context"
@@ -9,12 +9,16 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"go.encore.dev/emissary/server/http"
 	"go.encore.dev/emissary/server/proxy"
 	"go.encore.dev/emissary/server/tcp"
 	"golang.org/x/sync/errgroup"
 )
 
-func Run(ctx context.Context) {
+// Run starts an emissary server up. Due to how we need to package Emissary for different clouds, we have different
+// `main` functions, but they all just call this function after performing any cloud specific setup. We control
+// which `main` function is compiled into the binary using build tags.
+func Run(ctx context.Context) error {
 	// Start the main context for Emissary
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -33,32 +37,46 @@ func Run(ctx context.Context) {
 		cancel()
 	}()
 
-	// Initialise the proxy layer
-	if err := proxy.Init(ctx); err != nil {
+	// Load the config
+	config, err := proxy.LoadConfig(ctx)
+	if err != nil {
 		log.Fatal().Err(err).Msg("unable to initialise proxy layer")
-		os.Exit(1)
+		return err
 	}
 
+	return RunWithConfig(ctx, config)
+}
+
+// RunWithConfig allows end to end tests to pass in specific test config and run in parallel
+func RunWithConfig(ctx context.Context, config *proxy.Config) error {
 	// Start our various servers (http / tcp)
 	grp, ctx := errgroup.WithContext(ctx)
-	grp.Go(func() error {
-		if err := StartServer(ctx, 8000); err != nil {
-			return errors.Wrap(err, "error running http server")
-		}
+	if config.HttpPort > 0 {
+		grp.Go(func() error {
+			if err := http.StartServer(ctx, config); err != nil {
+				return errors.Wrap(err, "error running http server")
+			}
 
-		return nil
-	})
-	grp.Go(func() error {
-		if err := tcp.StartServer(ctx, 8001); err != nil {
-			return errors.Wrap(err, "error running tcp server")
-		}
+			return nil
+		})
+	}
 
-		return nil
-	})
+	if config.TcpPort > 0 {
+		grp.Go(func() error {
+			if err := tcp.StartServer(ctx, config); err != nil {
+				return errors.Wrap(err, "error running tcp server")
+			}
+
+			return nil
+		})
+	}
 
 	// Wait for one of the servers to return an error
 	if err := grp.Wait(); err != nil {
 		log.Err(err).Msg("there was a fatal error running emissary")
+		return err
 	}
+
 	log.Info().Msg("Emissary shutdown")
+	return nil
 }

@@ -12,7 +12,7 @@ import (
 
 func main() {
 	configureLogger()
-	emissaryClient := emissary.NewWebsocketDialer("ws://localhost:8000/proxy", auth.Key{
+	emissaryClient := emissary.NewWebsocketDialer("ws://localhost:8000", auth.Key{
 		KeyID: 381,
 		Data:  []byte("some super secret randomised key here.\n\nThis is simply an example key"),
 	})

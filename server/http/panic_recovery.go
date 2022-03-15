@@ -8,15 +8,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func init() {
-	router.Use(RecoveryHandler())
-}
-
 type recoveryHandler struct {
 	handler http.Handler
 }
 
-func RecoveryHandler() func(h http.Handler) http.Handler {
+func PanicRecovery() func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return &recoveryHandler{handler: h}
 	}

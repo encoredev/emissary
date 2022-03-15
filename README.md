@@ -2,6 +2,7 @@
   <a href="https://encore.dev" alt="encore"><img width="189px" src="https://encore.dev/assets/img/logo.svg"></a>
   <h3><a href="https://encore.dev">Encore – The Backend Development Engine</a></h3>
 </div>
+
 # Emissary
 
 When you deploy an [Encore application to your own cloud](https://encore.dev/docs/deploy/own-cloud) Emissary is deployed
@@ -15,10 +16,9 @@ allow [access to the database from the Encore CLI](https://encore.dev/docs/devel
 
 ## How it works
 
-Emissary is split into three module:
+Emissary is split into two modules:
 - [the `server` module](./server) which is the binary we deploy to your cloud.
 - [the `library` module (this folder)](.) which serves as the client library and is used by our platform to establish connections.
-- [the example `client`](./client/cmd/main.go) which serves as an example of how to use Emissary
                                                                                                                                        
 The library provides a `emissary.Dialer` which provides a `Dial` and a `DialContext` method. These can be provided to most
 Go networking enabled code as an underlying `Dial` function. When that other Go code tries to open a socket, it will use

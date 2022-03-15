@@ -3,6 +3,7 @@ package ws
 import (
 	"io"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -41,9 +42,10 @@ func (c *Conn) Read(dst []byte) (int, error) {
 	} else if _, msg, err := c.conn.ReadMessage(); err == nil {
 		src = msg
 	} else {
-		if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+		if websocket.IsCloseError(err, websocket.CloseNormalClosure) || strings.HasSuffix(err.Error(), "use of closed network connection") {
 			return 0, io.EOF
 		}
+
 		return 0, errors.Wrap(err, "unable to read socket")
 	}
 
@@ -92,6 +94,10 @@ func (c *Conn) Close() error {
 	}
 
 	return nil
+}
+
+func (c *Conn) CloseWrite() error {
+	return c.Close()
 }
 
 func (c *Conn) LocalAddr() net.Addr {

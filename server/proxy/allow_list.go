@@ -11,11 +11,11 @@ type AllowedHost struct {
 	Port int    `json:"port"`
 }
 
-type AccessList []AllowedHost
+type AllowedProxyTargets []AllowedHost
 
-var _ socks5.RuleSet = (AccessList)(nil)
+var _ socks5.RuleSet = (AllowedProxyTargets)(nil)
 
-func (a AccessList) Allow(ctx context.Context, req *socks5.Request) (context.Context, bool) {
+func (a AllowedProxyTargets) Allow(ctx context.Context, req *socks5.Request) (context.Context, bool) {
 	if req.Command != socks5.ConnectCommand {
 		log.Warn().Uint8("command", req.Command).Msg("only connect commands are allowed")
 		return ctx, false

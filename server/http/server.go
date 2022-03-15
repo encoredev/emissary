@@ -9,16 +9,25 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
+	"go.encore.dev/emissary/server/proxy"
 )
 
-var router = mux.NewRouter()
-
 // StartServer starts listening on the given port for HTTP requests
-func StartServer(ctx context.Context, port int) error {
-	log.Info().Int("port", port).Msg("starting http server")
+func StartServer(ctx context.Context, config *proxy.Config) error {
+	if config.HttpPort <= 0 {
+		return nil
+	}
 
+	// Setup the router
+	var router = mux.NewRouter()
+	router.Use(PanicRecovery(), RequestLogger())
+	router.Methods("GET").PathPrefix("/healthz").Handler(http.HandlerFunc(handleHealth))
+	router.Methods("GET").PathPrefix("/").Handler(handleProxy(config))
+
+	// Start the server
+	log.Info().Int("port", config.HttpPort).Msg("starting http server")
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
+		Addr:    fmt.Sprintf(":%d", config.HttpPort),
 		Handler: router,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
@@ -38,6 +47,10 @@ func StartServer(ctx context.Context, port int) error {
 
 	err := srv.ListenAndServe()
 	if err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+
 		return errors.Wrap(err, "error listening to http server")
 	}
 

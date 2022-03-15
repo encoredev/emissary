@@ -4,10 +4,14 @@ package main
 
 import (
 	"context"
+	"os"
 
-	"go.encore.dev/emissary/server/http"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	http.Run(context.Background())
+	if err := Run(context.Background()); err != nil {
+		log.Fatal().Err(err).Msg("emissary server exiting due to error")
+		os.Exit(1)
+	}
 }

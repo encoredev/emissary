@@ -13,11 +13,14 @@ import (
 )
 
 // StartServer starts listening on the given port for TCP connections
-func StartServer(ctx context.Context, port int) error {
-	log.Info().Int("port", port).Msg("starting tcp server")
+func StartServer(ctx context.Context, cfg *proxy.Config) error {
+	if cfg.TcpPort <= 0 {
+		return nil
+	}
+	log.Info().Int("port", cfg.TcpPort).Msg("starting tcp server")
 
 	var lc net.ListenConfig
-	srv, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
+	srv, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", cfg.TcpPort))
 	if err != nil {
 		return errors.Wrap(err, "unable to listen on tcp port")
 	}
@@ -45,12 +48,12 @@ func StartServer(ctx context.Context, port int) error {
 			continue
 		}
 
-		go handleConn(conn)
+		go handleConn(conn, cfg)
 	}
 }
 
 // handleConn handles a TCP connection and recovers from panics
-func handleConn(conn net.Conn) {
+func handleConn(conn net.Conn, cfg *proxy.Config) {
 	defer func() {
 		if err := recover(); err != nil {
 			stack := string(debug.Stack())
@@ -69,7 +72,7 @@ func handleConn(conn net.Conn) {
 	l := log.With().Str("remote", conn.RemoteAddr().String()).Str("proxy-method", "tcp").Logger()
 	l.Info().Msg("accepting tcp proxy request")
 
-	if err := proxy.ServeConn(conn); err != nil {
+	if err := cfg.ServeConn(conn); err != nil {
 		l.Err(err).Msg("unable to serve socks 5 proxy")
 	}
 
