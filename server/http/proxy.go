@@ -43,5 +43,5 @@ func handleProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	l.Info().Msg("websocket proxy connection closed")
+	l.Debug().Msg("websocket proxy connection closed")
 }
