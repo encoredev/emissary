@@ -11,5 +11,5 @@ jobs:
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
-          tool_name: "reviewdog""
+          tool_name: "reviewdog"
           reporter: github-pr-review
