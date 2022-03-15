@@ -6,19 +6,21 @@ import (
 	"net"
 
 	"github.com/cockroachdb/errors"
-	"github.com/golang/protobuf/proto"
 	"github.com/rs/zerolog/log"
 	"go.encore.dev/emissary/internal/auth"
 	"go.encore.dev/emissary/internal/emissaryproto"
 	"golang.org/x/net/proxy"
+	"google.golang.org/protobuf/proto"
 )
+
+const BufSize = 1024
 
 type transportDialer interface {
 	proxy.Dialer
 	proxy.ContextDialer
 }
 
-// Dialer is the primary dialer that is exposed from this library
+// Dialer is the primary dialer that is exposed from this library.
 type Dialer struct {
 	transportLayer transportDialer
 	key            auth.Key
@@ -26,7 +28,7 @@ type Dialer struct {
 
 var _ transportDialer = (*Dialer)(nil)
 
-// NewWebsocketDialer creates a dialer which will connect to emissary over a websocket
+// NewWebsocketDialer creates a dialer which will connect to emissary over a websocket.
 func NewWebsocketDialer(server string, key auth.Key) *Dialer {
 	return &Dialer{
 		transportLayer: &websocketDialer{address: server},
@@ -53,7 +55,7 @@ func (e *Dialer) DialContext(ctx context.Context, network, addr string) (c net.C
 	}
 	if connectMessage.ProtocolVersion != emissaryproto.ProtocolVersion {
 		_ = transportLayer.Close()
-		return nil, errors.Newf("unsupported emissary protocol version: supports %d, got %d", emissaryproto.ProtocolVersion, connectMessage.ProtocolVersion)
+		return nil, errors.Newf("unsupported emissary protocol version: supports %d, got %d", emissaryproto.ProtocolVersion, connectMessage.ProtocolVersion) //nolint:wrapcheck
 	}
 
 	// Create the login information
@@ -91,10 +93,10 @@ func (e *Dialer) DialContext(ctx context.Context, network, addr string) (c net.C
 	}
 }
 
-// readConnectMessage gets and unmarshals the connection header from the server
+// readConnectMessage gets and unmarshals the connection header from the server.
 func readConnectMessage(transportLayer net.Conn) (*emissaryproto.ServerConnect, error) {
 	// Read the message
-	buf := make([]byte, 1024)
+	buf := make([]byte, BufSize)
 	n, err := transportLayer.Read(buf)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to read connect message")
@@ -109,13 +111,13 @@ func readConnectMessage(transportLayer net.Conn) (*emissaryproto.ServerConnect, 
 
 	// Verify the constants are set as expected
 	if connectMessage.ServerSoftware != emissaryproto.EmissaryServer {
-		return nil, errors.Newf("invalid emissary server, got; %s", connectMessage.ServerSoftware)
+		return nil, errors.Newf("invalid emissary server, got; %s", connectMessage.ServerSoftware) //nolint:wrapcheck
 	}
 	if connectMessage.ProtocolVersion <= 0 {
-		return nil, errors.Newf("invalid emissary protocol version, got; %d", connectMessage.ProtocolVersion)
+		return nil, errors.Newf("invalid emissary protocol version, got; %d", connectMessage.ProtocolVersion) //nolint:wrapcheck
 	}
 	if len(connectMessage.ConnectionNonce) != emissaryproto.NonceSize {
-		return nil, errors.Newf("invalid length nonce, length; %d", len(connectMessage.ConnectionNonce))
+		return nil, errors.Newf("invalid length nonce, length; %d", len(connectMessage.ConnectionNonce)) //nolint:wrapcheck
 	}
 	if allZero(connectMessage.ConnectionNonce) {
 		return nil, errors.New("connection nonce was all zeros")

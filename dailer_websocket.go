@@ -10,7 +10,9 @@ import (
 	"go.encore.dev/emissary/internal/ws"
 )
 
-// The websocket dialer is one way of accessing an Emissary server
+const HandshakeTimeout = 10 * time.Second
+
+// The websocket dialer is one way of accessing an Emissary server.
 type websocketDialer struct {
 	address string
 }
@@ -28,7 +30,7 @@ func (w *websocketDialer) DialContext(ctx context.Context, network, _ string) (n
 
 	// Dial the basic websocket
 	dialer := &websocket.Dialer{
-		HandshakeTimeout: 45 * time.Second,
+		HandshakeTimeout: HandshakeTimeout,
 	}
 	wsc, _, err := dialer.DialContext(ctx, w.address, nil)
 	if err != nil {

@@ -25,7 +25,7 @@ type Key struct {
 
 type Keys []Key
 
-// SignRequest signs our request using the Encore hmac standard
+// SignRequest signs our request using the Encore hmac standard.
 func SignRequest(key Key, content string) (date string, sig string, err error) {
 	date = time.Now().UTC().Format(http.TimeFormat)
 	mac := hmac.New(sha256.New, key.Data)

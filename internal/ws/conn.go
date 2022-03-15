@@ -22,9 +22,12 @@ type Conn struct {
 
 var _ net.Conn = (*Conn)(nil)
 
+const WriteTimeout = 10 * time.Second
+
 func NewClient(conn *websocket.Conn) *Conn {
 	return &Conn{
 		conn:   conn,
+		buff:   nil,
 		closed: atomic.NewBool(false),
 	}
 }
@@ -33,7 +36,6 @@ func (c *Conn) Read(dst []byte) (int, error) {
 	c.r.Lock()
 	defer c.r.Unlock()
 
-	ldst := len(dst)
 	// use buffer or read new message
 	var src []byte
 	if len(c.buff) > 0 {
@@ -51,7 +53,7 @@ func (c *Conn) Read(dst []byte) (int, error) {
 
 	// copy src->dest
 	var n int
-	if len(src) > ldst {
+	if ldst := len(dst); len(src) > ldst {
 		// copy as much as possible of src into dst
 		n = copy(dst, src[:ldst])
 		// copy remainder into buffer
@@ -81,16 +83,15 @@ func (c *Conn) Close() error {
 		err := c.conn.WriteControl(
 			websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.CloseNormalClosure, "encore"),
-			time.Now().Add(10*time.Second),
+			time.Now().Add(WriteTimeout),
 		)
 		if err != nil && !errors.Is(err, websocket.ErrCloseSent) {
 			err = errors.Wrap(err, "unable to send close control message")
 			log.Err(err).Msg("unable to close connection")
 			return err
-
 		}
 
-		return c.conn.Close()
+		return errors.Wrap(c.conn.Close(), "unable to close connection")
 	}
 
 	return nil
@@ -110,19 +111,22 @@ func (c *Conn) RemoteAddr() net.Addr {
 
 func (c *Conn) SetDeadline(t time.Time) error {
 	if err := c.conn.SetReadDeadline(t); err != nil {
-		return err
+		return errors.Wrap(err, "unable to set read deadline")
 	}
-	return c.conn.SetWriteDeadline(t)
+	return errors.Wrap(c.conn.SetWriteDeadline(t), "unable to set write deadline")
 }
 
 func (c *Conn) SetReadDeadline(t time.Time) error {
-	return c.conn.SetWriteDeadline(t)
+	return errors.Wrap(c.conn.SetReadDeadline(t), "unable to set read deadline")
 }
 
 func (c *Conn) SetWriteDeadline(t time.Time) error {
-	return c.conn.SetWriteDeadline(t)
+	return errors.Wrap(c.conn.SetWriteDeadline(t), "unable to set write deadline")
 }
 
 func (c *Conn) SendPing() error {
-	return c.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(10*time.Second))
+	return errors.Wrap(
+		c.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(WriteTimeout)),
+		"unable to send ping control messaged",
+	)
 }
