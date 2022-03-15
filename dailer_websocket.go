@@ -2,15 +2,18 @@ package emissary
 
 import (
 	"context"
+	"io"
 	"net"
 	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
 	"go.encore.dev/emissary/internal/ws"
 )
 
 const HandshakeTimeout = 10 * time.Second
+const PingTime = 30 * time.Second
 
 // The websocket dialer is one way of accessing an Emissary server.
 type websocketDialer struct {
@@ -41,7 +44,25 @@ func (w *websocketDialer) DialContext(ctx context.Context, network, _ string) (n
 	// Wrap the websocket so it can be used like a net.Conn and return it
 	conn := ws.NewClient(wsc)
 
-	// FIXME: Start background routine for ping/pong admin messages
+	// Startup a background keep-alive so the socket doesn't close when there's no traffic
+	go func() {
+		t := time.NewTicker(PingTime)
+		defer t.Stop()
 
+		for {
+			select {
+			case <-ctx.Done():
+				return
+
+			case <-t.C:
+				if err := conn.SendPing(); err != nil {
+					if !errors.Is(err, io.EOF) {
+						log.Err(err).Msg("unable to send websocket keep-alive")
+					}
+					return
+				}
+			}
+		}
+	}()
 	return conn, nil
 }

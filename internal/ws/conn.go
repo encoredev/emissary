@@ -125,8 +125,15 @@ func (c *Conn) SetWriteDeadline(t time.Time) error {
 }
 
 func (c *Conn) SendPing() error {
-	return errors.Wrap(
-		c.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(WriteTimeout)),
-		"unable to send ping control messaged",
-	)
+	err := c.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(WriteTimeout))
+
+	if err != nil {
+		if websocket.IsCloseError(err, websocket.CloseNormalClosure) || strings.HasSuffix(err.Error(), "use of closed network connection") || errors.Is(err, websocket.ErrCloseSent) {
+			return io.EOF
+		}
+
+		return errors.Wrap(err, "unable to send ping control messaged")
+	}
+
+	return nil
 }
