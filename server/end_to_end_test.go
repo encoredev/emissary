@@ -165,7 +165,7 @@ type targetServer struct {
 func mustCreateTargetServer(c *quicktest.C, ctx context.Context) *targetServer {
 	targetPort := mustFreePort(c)
 	var lc net.ListenConfig
-	socket, err := lc.Listen(ctx, "tcp", fmt.Sprintf("0:%d", targetPort))
+	socket, err := lc.Listen(ctx, "tcp", fmt.Sprintf("localhost:%d", targetPort))
 	c.Assert(err, quicktest.IsNil, quicktest.Commentf("unable to create target server"))
 
 	rtn := &targetServer{

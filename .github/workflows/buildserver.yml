@@ -4,6 +4,7 @@ on:
     branches:
       - 'main'
       - 'debugging'
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -19,6 +20,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -27,3 +35,5 @@ jobs:
           push: true
           tags: |
             ghcr.io/encoredev/emissary:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache

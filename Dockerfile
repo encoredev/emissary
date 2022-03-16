@@ -14,17 +14,6 @@ RUN --mount=target=. \
 # Now copy over the rest of the source code
 COPY --link . .
 
-# Test the code
-RUN --mount=target=. \
-    --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    go vet -v ./... && cd server && go vet -v ./...
-
-RUN --mount=target=. \
-    --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    go test -v ./... && cd server && go test -v ./...
-
 # Now build the app for the target OS / architecture
 ARG TARGETOS
 ARG TARGETARCH
