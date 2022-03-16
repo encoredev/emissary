@@ -18,12 +18,12 @@ COPY --link . .
 RUN --mount=target=. \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    go vet -v
+    go vet -v ./... && cd server && go vet -v ./...
 
 RUN --mount=target=. \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    go test -v
+    go test -v ./... && cd server && go test -v ./...
 
 # Now build the app for the target OS / architecture
 ARG TARGETOS
@@ -40,7 +40,9 @@ COPY --from=build /out/emissary /
 
 LABEL org.opencontainers.image.authors="support@encore.dev" \
 		org.opencontainers.image.vendor="Encoretivity AB" \
-		org.opencontainers.image.description="The Encore Emissary"
+		org.opencontainers.image.title="Emissary Server" \
+		org.opencontainers.image.source="https://github.com/encoredev/emissary" \
+		org.opencontainers.image.description="Emissary is a server which is used by the Encore platform to securely tunnel into your cloud enviroment and is deployed alongside your Encore application"
 
 ENV EMISSARY_HTTP_PORT=80
 ENV EMISSARY_ALLOWED_PROXY_TARGETS="[]"
