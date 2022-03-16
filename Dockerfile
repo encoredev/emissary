@@ -31,7 +31,7 @@ LABEL org.opencontainers.image.authors="support@encore.dev" \
 		org.opencontainers.image.vendor="Encoretivity AB" \
 		org.opencontainers.image.title="Emissary Server" \
 		org.opencontainers.image.source="https://github.com/encoredev/emissary" \
-		org.opencontainers.image.description="Emissary is a server which is used by the Encore platform to securely tunnel into your cloud enviroment and is deployed alongside your Encore application"
+		org.opencontainers.image.description="Emissary is a server which is used by the Encore platform to securely tunnel into your cloud environment and is deployed alongside your Encore application"
 
 ENV EMISSARY_HTTP_PORT=80
 ENV EMISSARY_ALLOWED_PROXY_TARGETS="[]"

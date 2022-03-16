@@ -52,6 +52,7 @@ jobs:
             org.opencontainers.image.title=Emissary Server
             org.opencontainers.image.vendor=Encoretivity AB
             org.opencontainers.image.authors=support@encore.dev
+            org.opencontainers.image.description=Emissary is a server which is used by the Encore platform to securely tunnel into your cloud environment and is deployed alongside your Encore application
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
             type=semver,pattern={{version}}
