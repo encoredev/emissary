@@ -126,7 +126,7 @@ func readConnectMessage(transportLayer net.Conn) (*emissaryproto.ServerConnect, 
 	log.Debug().Str("server", connectMessage.ServerSoftware).
 		Str("server_version", connectMessage.ServerVersion).
 		Int32("protocol_version", connectMessage.ProtocolVersion).
-		Msg("connected to emissary transport layer")
+		Msg("connected to emissary server via transport layer")
 
 	return connectMessage, nil
 }
