@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"runtime/debug"
+	"strings"
 
 	"github.com/cockroachdb/errors"
 	"github.com/rs/zerolog"
@@ -40,6 +41,10 @@ func StartServer(ctx context.Context, cfg *proxy.Config) error {
 		if err != nil {
 			select {
 			case <-ctx.Done():
+				if strings.Contains(err.Error(), "use of closed network connection") {
+					return nil
+				}
+
 				return errors.Wrap(err, "unable to accept")
 			default:
 			}
