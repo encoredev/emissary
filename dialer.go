@@ -23,13 +23,13 @@ type transportDialer interface {
 // Dialer is the primary dialer that is exposed from this library.
 type Dialer struct {
 	transportLayer transportDialer
-	key            auth.Key
+	key            Key
 }
 
 var _ transportDialer = (*Dialer)(nil)
 
 // NewWebsocketDialer creates a dialer which will connect to emissary over a websocket.
-func NewWebsocketDialer(server string, key auth.Key) *Dialer {
+func NewWebsocketDialer(server string, key Key) *Dialer {
 	return &Dialer{
 		transportLayer: &websocketDialer{address: server},
 		key:            key,
