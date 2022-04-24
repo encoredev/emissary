@@ -17,6 +17,7 @@ type Config struct {
 	TcpPort             int                 // What port should this server listen for raw TCP connections on (0 == disabled)
 	AuthKeys            auth.Keys           // What auth keys can be used when talking with this Emissary server
 	AllowedProxyTargets AllowedProxyTargets // What proxy targets are allowed through this Emissary server
+	DNSServers          []string            // The DNS server IPs to use; nil means the system default
 }
 
 // LoadConfig performs setup for the proxy layer and returns an error if we cannot initialise
@@ -78,5 +79,6 @@ func LoadConfig(_ context.Context) (*Config, error) {
 		TcpPort:             viper.GetInt("tcp_port"),
 		AuthKeys:            authKeys,
 		AllowedProxyTargets: allowedProxyTargets,
+		DNSServers:          viper.GetStringSlice("dns_servers"),
 	}, nil
 }
