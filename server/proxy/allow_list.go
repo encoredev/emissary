@@ -1,9 +1,10 @@
 package proxy
 
 import (
+	"context"
+
 	"github.com/armon/go-socks5"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/net/context"
 )
 
 type AllowedHost struct {
