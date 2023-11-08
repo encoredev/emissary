@@ -7,7 +7,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/rs/zerolog v1.26.1
 	go.uber.org/atomic v1.9.0
-	golang.org/x/net v0.7.0
+	golang.org/x/net v0.17.0
 	google.golang.org/protobuf v1.26.0
 )
 
@@ -20,5 +20,5 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
-	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 )
