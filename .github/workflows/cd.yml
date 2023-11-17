@@ -58,7 +58,7 @@ jobs:
         with:
           images: |
             ${{ env.GH_REGISTRY }}/${{ env.IMAGE_NAME }}
-            ${{ env.GCP_REGISTRY }}/encorecloud-shared/starter/${{ env.IMAGE_NAME }}
+            ${{ env.GCP_REGISTRY }}/encorecloud-shared/emissary/${{ env.IMAGE_NAME }}
           labels: |
             org.opencontainers.image.title=Emissary Server
             org.opencontainers.image.vendor=Encoretivity AB
