@@ -1,6 +1,6 @@
 module go.encore.dev/emissary
 
-go 1.17
+go 1.18
 
 require (
 	github.com/cockroachdb/errors v1.9.0
