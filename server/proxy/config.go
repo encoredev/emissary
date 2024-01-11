@@ -18,6 +18,7 @@ type Config struct {
 	AuthKeys            auth.Keys           // What auth keys can be used when talking with this Emissary server
 	AllowedProxyTargets AllowedProxyTargets // What proxy targets are allowed through this Emissary server
 	DNSServers          []string            // The DNS server IPs to use; nil means the system default
+	HealthPath          string              // The path to use for health checks
 }
 
 // LoadConfig performs setup for the proxy layer and returns an error if we cannot initialise
@@ -29,6 +30,7 @@ func LoadConfig(_ context.Context) (*Config, error) {
 
 	// Now configure viper with our default config and bind it to read from the environment
 	viper.SetDefault("http_port", 8080)
+	viper.SetDefault("health_path", "/healthz")
 	viper.SetEnvPrefix("emissary")
 	viper.AutomaticEnv()
 
@@ -80,5 +82,6 @@ func LoadConfig(_ context.Context) (*Config, error) {
 		AuthKeys:            authKeys,
 		AllowedProxyTargets: allowedProxyTargets,
 		DNSServers:          viper.GetStringSlice("dns_servers"),
+		HealthPath:          viper.GetString("health_path"),
 	}, nil
 }

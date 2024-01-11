@@ -21,7 +21,7 @@ func StartServer(ctx context.Context, config *proxy.Config) error {
 	// Setup the router
 	var router = mux.NewRouter()
 	router.Use(PanicRecovery(), RequestLogger())
-	router.Methods("GET").PathPrefix("/healthz").Handler(http.HandlerFunc(handleHealth))
+	router.Methods("GET").PathPrefix(config.HealthPath).Handler(http.HandlerFunc(handleHealth(config)))
 	router.Methods("GET").PathPrefix("/").Handler(handleProxy(config))
 
 	// Start the server
