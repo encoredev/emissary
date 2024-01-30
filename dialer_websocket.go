@@ -12,7 +12,7 @@ import (
 	"go.encore.dev/emissary/internal/ws"
 )
 
-const HandshakeTimeout = 10 * time.Second
+const HandshakeTimeout = 20 * time.Second
 const PingTime = 30 * time.Second
 
 // The websocket dialer is one way of accessing an Emissary server.
