@@ -56,7 +56,7 @@ func LoadConfig(_ context.Context) (*Config, error) {
 		}
 	}
 	if len(allowedProxyTargets) == 0 {
-		return nil, errors.New("no allowed proxy targets loaded from environment")
+		log.Warn().Msg("no allowed proxy targets loaded from environment; all proxy connections will be rejected")
 	}
 
 	// Load the auth keys
