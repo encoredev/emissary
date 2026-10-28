@@ -8,7 +8,7 @@ require (
 	github.com/rs/zerolog v1.26.1
 	go.uber.org/atomic v1.9.0
 	golang.org/x/net v0.17.0
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
