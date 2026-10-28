@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
@@ -20,10 +20,10 @@ jobs:
     name: "test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v7
         with:
           go-version: 1.18
 

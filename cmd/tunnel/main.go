@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"os"
 
@@ -38,6 +39,11 @@ func main() {
 		log.Fatal().Msg("expected a key id passed in with `-kid`")
 		os.Exit(1)
 	}
+	if *keyID > math.MaxUint32 {
+		log.Fatal().Msg("key id passed in with `-kid` must fit in a uint32")
+		os.Exit(1)
+	}
+	kid := uint32(*keyID) //nolint:gosec // bounds checked above
 
 	if key == nil || *key == "" {
 		flag.PrintDefaults()
@@ -80,7 +86,7 @@ func main() {
 		go func() {
 			// Setup the dialer
 			log.Info().Msgf("dialing emissary server at %s", *host)
-			dialer := emissary.NewWebsocketDialer(*host, auth.Key{KeyID: uint32(*keyID), Data: data})
+			dialer := emissary.NewWebsocketDialer(*host, auth.Key{KeyID: kid, Data: data})
 
 			remote, err := dialer.Dial("tcp", *target)
 			if err != nil {
@@ -89,10 +95,11 @@ func main() {
 			}
 
 			// Proxy traffic
-			errs := make(chan error, 2)
+			const numDirections = 2 // local -> remote and remote -> local
+			errs := make(chan error, numDirections)
 			go proxy(local, remote, errs)
 			go proxy(remote, local, errs)
-			for i := 0; i < 2; i++ {
+			for i := 0; i < numDirections; i++ {
 				e := <-errs
 				if e != nil {
 					log.Fatal().Err(err).Msg("error while proxying traffic through the tunnel")
